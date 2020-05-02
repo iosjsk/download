@@ -1,25 +1,28 @@
-node('master') 
+pipeline
 {
-    stage('ContinuousDownload') 
+    agent any
+    stages
     {
-       git 'https://github.com/intelliqittrainings/maven.git'
+        stage('continousdownload')
+        {
+            steps
+            {
+               git 'https://github.com/iosjsk/download.git' 
+            }
+        }
+        stage('continous build')
+        {
+            steps
+            {
+                sh label: '', script: 'mvn package'
+            }
+        }
+        stage('continousdeployment')
+        {
+            steps
+            {
+                sh label: '', script: ' scp -i /home/jenkins/qakey.ppk  /home/jenkins/workspace/declar/webapp/target/webapp.war root@100.24.3.40:/usr/local/tomcat/webapps/qq.war'
+            }
+        }
+        
     }
-    stage('ContinuousBuild')
-    {
-        sh label: '', script: 'mvn package'
-    }
-    stage('ContinuousDeployment')
-    {
-        sh label: '', script: 'scp /home/ubuntu/.jenkins/workspace/ScriptedPipeline/webapp/target/webapp.war ubuntu@172.31.92.242:/var/lib/tomcat8/webapps/testapp.war'
-    }
-    stage('ContinuousTesting')
-    {
-        git 'https://github.com/intelliqittrainings/FunctionalTesting.git'
-        sh label: '', script: 'java -jar /home/ubuntu/.jenkins/workspace/ScriptedPipeline/testing.jar'
-    }
-    stage('ContinuousDelivery')
-    {
-       sh label: '', script: 'scp /home/ubuntu/.jenkins/workspace/ScriptedPipeline/webapp/target/webapp.war ubuntu@172.31.88.41:/var/lib/tomcat8/webapps/prodapp.war' 
-    }
-    
-}
